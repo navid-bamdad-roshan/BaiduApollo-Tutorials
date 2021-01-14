@@ -118,6 +118,7 @@ In order to run the Apollo on the LEXUS RX 450h, we need some setups on the ubun
 
 **Note:** This step is not required for driving the car using keyboard.<br>
 **Note:** This gonfig file is for **NovAtel PwrPak7D-E2™ (Kit 2.5)** gnss receiver.
+You have to replace the `<gnss receiver ip address>`, `<gnss receiver port number>`, and `<proj4_text for your region>` with correct values.
 
 - The `modules/drivers/gnss/conf/gnss_conf.pb.txt` file should be as follows
 
