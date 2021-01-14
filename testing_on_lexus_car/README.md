@@ -116,7 +116,79 @@ In order to run the Apollo on the LEXUS RX 450h, we need some setups on the ubun
 
 ## Setup GNSS
 
-## **TODO**
+**Note:** This step is not required for driving the car using keyboard.<br>
+**Note:** This gonfig file is for **NovAtel PwrPak7D-E2™ (Kit 2.5)** gnss receiver.
+
+- The `modules/drivers/gnss/conf/gnss_conf.pb.txt` file should be as follows
+
+  ```
+  data {
+      format: NOVATEL_BINARY
+      tcp {
+          address: "<gnss receiver ip address>"
+          port: <gnss receiver port number>
+      }
+  }
+
+  rtk_solution_type: RTK_RECEIVER_SOLUTION
+  imu_type: ADIS16488
+  proj4_text: "<proj4_text for your region>"
+
+
+  # If given, the driver will send velocity info into novatel one time per second
+  wheel_parameters: "SETWHEELPARAMETERS 100 1 1\r\n"
+  #########################################################################
+  # notice: only for debug, won't configure device through driver online!!!
+  #########################################################################
+  login_commands: "UNLOGALL THISPORT\r\n"
+  login_commands: "LOG  GPRMC ONTIME 1.0 0.25\r\n"
+  #login_commands: "EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10\r\n"
+  #login_commands: "EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000\r\n"
+  login_commands: "LOG GPGGA ONTIME 1.0\r\n"
+
+  #login_commands: "log bestgnssposb ontime 1\r\n"
+  #login_commands: "log bestgnssvelb ontime 1\r\n"
+  #login_commands: "log bestposb ontime 1\r\n"
+  #login_commands: "log INSPVAXB ontime 0.5\r\n"
+  #login_commands: "log INSPVASB ontime 0.01\r\n"
+  #login_commands: "log CORRIMUDATASB ontime 0.01\r\n"
+  #login_commands: "log RAWIMUSXB onnew 0 0\r\n"
+  #login_commands: "log INSCOVSB ontime 1\r\n"
+  #login_commands: "log mark1pvab onnew\r\n"
+  #
+  #login_commands: "log rangeb ontime 0.2\r\n"
+  #login_commands: "log bdsephemerisb\r\n"
+  #login_commands: "log gpsephemb\r\n"
+  #login_commands: "log gloephemerisb\r\n"
+  #login_commands: "log bdsephemerisb ontime 15\r\n"
+  #login_commands: "log gpsephemb ontime 15\r\n"
+  #login_commands: "log gloephemerisb ontime 15\r\n"
+
+  #login_commands: "log imutoantoffsetsb once\r\n"
+  #login_commands: "log vehiclebodyrotationb onchanged\r\n"
+
+  login_commands: "LOG GPRMC ONTIME 1.0 0.25\r\n"
+  login_commands: "LOG GPGGA ONTIME 1.0\r\n"
+  login_commands: "LOG BESTGNSSPOSB ONTIME 1\r\n"
+  login_commands: "LOG BESTGNSSVELB ONTIME 1\r\n"
+  login_commands: "LOG BESTPOSB ONTIME 1\r\n"
+  login_commands: "LOG INSPVAXB ONTIME 1\r\n"
+  login_commands: "LOG INSPVASB ONTIME 0.01\r\n"
+  login_commands: "LOG CORRIMUDATASB ONTIME 0.01\r\n"
+  login_commands: "LOG RAWIMUSXB ONNEW 0 0\r\n"
+  login_commands: "LOG MARK1PVAB ONNEW\r\n"
+
+  login_commands: "LOG RANGEB ONTIME 1\r\n"
+  login_commands: "LOG BDSEPHEMERISB ONTIME 15\r\n"
+  login_commands: "LOG GPSEPHEMB ONTIME 15\r\n"
+  login_commands: "LOG GLOEPHEMERISB ONTIME 15\r\n"
+
+  login_commands: "LOG INSCONFIGB ONCE\r\n"
+  login_commands: "LOG VEHICLEBODYROTATIONB ONCHANGED\r\n"
+
+  logout_commands: "EVENTOUTCONTROL MARK2 DISABLE\r\n"
+  logout_commands: "EVENTOUTCONTROL MARK1 DISABLE\r\n"
+  ```
 
 ## Drive car using keyboard
 
@@ -135,12 +207,28 @@ In order to run the Apollo on the LEXUS RX 450h, we need some setups on the ubun
 
 ## Recording trajectory waypoints
 
-## **TODO**
+- Setup and run rtk_recorder.sh
+
+  ```
+  ./scripts/rtk_recorder.sh setup
+  ./scripts/rtk_recorder.sh start
+  ```
+
+- Drive around to record waypoints. Once you are finished, press `Ctrl + C` to stop recording.
+- The recorded waypoints are stored in the `/apollo/data/log/garage.csv`
 
 ## Following recorded trajectory
 
-## **TODO**
+- Drive the car to start location of trajectory recording.
+- Run following to start rtk_player
 
-**NB!**
+  ```
+  ./scripts/rtk_player.sh setup
+  ./scripts/rtk_player.sh start
+  ```
 
-Use `modules/control/tools/pad_terminal.cc` to set driving mode to `COMPLETE_MANUAL` / `COMPLETE_AUTO_DRIVE`
+- Run `./bazel-bin/modules/control/tools/pad_terminal` and press `1` to enter auto driving mode. By entering auto driving mode, apollo will control the car to follow the recorded path.
+
+  **Note**
+
+  `modules/control/tools/pad_terminal.cc` is used to set driving mode `COMPLETE_MANUAL` / `COMPLETE_AUTO_DRIVE`
